@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <head th:replace="~{fragments/head :: head('Cadastro de Pessoa')}"></head>
+</head>
+
+<main>
+    <div class="container py-4">
+
+        <h1 th:if="${tipoPessoa == 'PF'}"
+            th:text="${pessoaFisica != null and pessoaFisica.id != null} ? 'Edição de Pessoa Física' : 'Cadastro de Pessoa Física'">Cadastro de PF</h1>
+
+        <h1 th:if="${tipoPessoa == 'PJ'}"
+            th:text="${pessoaJuridica != null and pessoaJuridica.id != null} ? 'Edição de Pessoa Jurídica' : 'Cadastro de Pessoa Jurídica'">Cadastro de PJ</h1>
+
+        <div th:if="${tipoPessoa == 'PF'}">
+            <form th:action="${pessoaFisica.id == null} ? @{/pessoa/savePF} : @{/pessoa/updatePF}"
+                  th:object="${pessoaFisica}"
+                  method="post">
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="mb-3">
+                    <label for="nomeInput" class="form-label">Nome:</label>
+                    <input id="nomeInput" class="form-control" type="text" th:field="*{nome}" placeholder="Nome Completo" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="cpfInput" class="form-label">CPF:</label>
+                    <input id="cpfInput" class="form-control" type="text" th:field="*{cpf}" placeholder="000.000.000-00" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emailInput" class="form-label">Email:</label>
+                    <input id="emailInput" class="form-control" type="email" th:field="*{email}" placeholder="exemplo@dominio.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="telefoneInput" class="form-label">Telefone:</label>
+                    <input id="telefoneInput" class="form-control" type="text" th:field="*{telefone}" placeholder="(99) 99999-9999" required>
+                </div>
+
+                <input type="submit" class="btn btn-success" th:value="${pessoaFisica.id == null} ? 'Salvar PF' : 'Atualizar PF'">
+            </form>
+        </div>
+
+
+        <div th:if="${tipoPessoa == 'PJ'}">
+            <form th:action="${pessoaJuridica.id == null} ? @{/pessoa/savePJ} : @{/pessoa/updatePJ}"
+                  th:object="${pessoaJuridica}"
+                  method="post">
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="mb-3">
+                    <label for="razaoSocialInput" class="form-label">Razão Social:</label>
+                    <input id="razaoSocialInput" class="form-control" type="text" th:field="*{razaoSocial}" placeholder="Razão Social" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="cnpjInput" class="form-label">CNPJ:</label>
+                    <input id="cnpjInput" class="form-control" type="text" th:field="*{cnpj}" placeholder="00.000.000/0000-00" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emailInputPJ" class="form-label">Email:</label>
+                    <input id="emailInputPJ" class="form-control" type="email" th:field="*{email}" placeholder="contato@empresa.com.br" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="telefoneInputPJ" class="form-label">Telefone:</label>
+                    <input id="telefoneInputPJ" class="form-control" type="text" th:field="*{telefone}" placeholder="(99) 9999-9999" required>
+                </div>
+
+                <input type="submit" class="btn btn-success" th:value="${pessoaJuridica.id == null} ? 'Salvar PJ' : 'Atualizar PJ'">
+            </form>
+        </div>
+
+        <br>
+        <a th:href="@{/pessoa/list}">Voltar para Lista de Pessoas</a>
+    </div>
+</main>
+</html>

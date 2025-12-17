@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}">
+
+<head>
+    <head th:replace="~{fragments/head :: head('Listagem de Vendas')}"></head>
+</head>
+
+<main>
+
+    <div class="container mt-4">
+        <h1>Listagem de Vendas</h1>
+
+        <a th:href="@{/produto/list}" class="btn btn-primary mb-4">
+            <i class="bi bi-plus-circle"></i> Nova Venda
+        </a>
+
+        <form th:action="@{/vendas/list}" method="get" class="mb-4 p-3 border rounded bg-light row g-3">
+            <div class="col-md-5">
+                <label for="dataInicialInput" class="form-label">Data Inicial:</label>
+                <input id="dataInicialInput" type="date" class="form-control" name="dataInicial" th:value="${dataInicial}">
+            </div>
+            <div class="col-md-5">
+                <label for="dataFinalInput" class="form-label">Data Final:</label>
+                <input id="dataFinalInput" type="date" class="form-control" name="dataFinal" th:value="${dataFinal}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-info me-2" type="submit">Filtrar</button>
+                <a th:href="@{/vendas/list}" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+
+        <div th:if="${vendas != null}">
+            <p>Total de vendas encontradas: <span th:text="${vendas.size()}"></span></p>
+
+            <div th:if="${!vendas.isEmpty()}">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data da Venda</th> <th>Cliente</th> <th>Descrição</th>
+                        <th>Valor Total</th> <th>Ações</th> </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="venda : ${vendas}">
+                        <td th:text="${venda.id}"></td>
+                        <td th:text="${#temporals.format(venda.dataVenda, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${venda.cliente.nome != null ? venda.cliente.nome : venda.cliente.razaoSocial}"></td>
+
+                        <td th:text="${venda.descricao}"></td>
+
+                        <td th:text="${#numbers.formatCurrency(venda.total)}"></td>
+
+                        <td>
+                            <a th:href="@{/vendas/detalhe/{id}(id=${venda.id})}" class="btn btn-sm btn-outline-primary">Detalhes</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:unless="${!vendas.isEmpty()}" class="alert alert-warning" role="alert">
+                Nenhuma venda encontrada com os filtros aplicados.
+            </div>
+        </div>
+    </div>
+
+</main>
+
+</html>

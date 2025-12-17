@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}"> <head>
+    <head th:replace="~{fragments/head :: head('Lista de Produtos')}">
+
+    </head>
+</head>
+
+<main>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Produtos Disponíveis</h1>
+
+            <a th:href="@{/vendas/carrinho}" class="btn btn-primary position-relative">
+                <i class="bi bi-cart-fill"></i> Ver Carrinho
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      th:text="${carrinhoCount}">0</span>
+            </a>
+        </div>
+        <a th:href="@{/produto/form}" class="btn btn-primary position-relative"><i class="bi bi-plus-circle"></i> Novo Produto
+        </a>
+        <div th:if="${success != null}" class="alert alert-success" role="alert" th:text="${success}">
+            Produto adicionado ao carrinho com sucesso!
+        </div>
+        <div th:if="${error != null}" class="alert alert-danger" role="alert" th:text="${error}">
+            Erro ao adicionar produto.
+        </div>
+
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div th:each="p : ${produtos}" class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 th:text="${p.descricao}" class="card-title">Nome do Produto</h5>
+
+                    <p th:text="${#numbers.formatCurrency(p.valor)}" class="card-text text-success fw-bold">R$ 10,00</p>
+
+                    <form th:action="@{/produto/adicionar/{id}(id=${p.id})}" method="post" class="d-flex mt-2">
+                        <input type="number"
+                               name="quantidade"
+                               value="1"
+                               min="1"
+                               class="form-control me-2"
+                               style="width: 80px;"
+                               required>
+
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            <i class="bi bi-cart-plus"></i> Adicionar
+                        </button>
+                    </form>
+
+                    <a th:href="@{/produto/edit/{id}(id=${p.id})}" class="btn btn-sm btn-outline-secondary mt-2">Editar</a>
+                    <a th:href="@{/produto/remove/{id}(id=${p.id})}" class="btn btn-sm btn-outline-danger mt-2"
+                       onclick="return confirm('Tem certeza que deseja remover este produto?');">
+                        Remover
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+</html>

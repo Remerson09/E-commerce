@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <head th:replace="~{fragments/head :: head('Nova Venda')}"></head>
+</head>
+
+<main>
+  <div class="container py-4">
+    <h1>Nova Venda (Simulação de Carrinho)</h1>
+
+    <form th:action="@{/venda/save}" th:object="${venda}" method="post">
+
+      <input th:if="${venda.id != null}" type="hidden" th:field="*{id}">
+
+      <div class="mb-4 card card-body bg-light">
+        <h5 class="card-title">Cliente</h5>
+        <label for="clienteSelect" class="form-label">Selecione o Cliente:</label>
+        <select id="clienteSelect" class="form-control" th:field="*{cliente}">
+          <option value="">Selecione o Cliente</option>
+          <option th:each="cliente : ${clientes}"
+                  th:value="${cliente.id}"
+                  th:text="${cliente.nome != null ? cliente.nome : cliente.razaoSocial}">
+            Nome do Cliente
+          </option>
+        </select>
+      </div>
+
+      <div class="mb-4 card card-body">
+        <h5 class="card-title">Item de Venda</h5>
+
+        <div th:object="${venda.itens[0]}">
+
+          <label for="produtoSelect" class="form-label">Selecione o Produto:</label>
+          <select id="produtoSelect" class="form-control" th:field="*{produto.id}">
+            <option value="">Selecione um produto</option>
+            <option th:each="prod : ${produtos}"
+                    th:value="${prod.id}"
+                    th:text="${prod.descricao + ' (R$ ' + #numbers.formatDecimal(prod.valor, 1, 2) + ')'}">
+              Produto e Valor
+            </option>
+          </select>
+
+          <div class="mt-3">
+            <label for="quantidadeInput" class="form-label">Quantidade:</label>
+            <input id="quantidadeInput" type="number" class="form-control" th:field="*{quantidade}" min="1" required/>
+          </div>
+
+        </div>
+
+        <div class="mt-3">
+          <label for="descricaoVenda" class="form-label">Descrição da Venda:</label>
+          <input id="descricaoVenda" type="text" class="form-control" th:field="*{descricao}" placeholder="Ex: Venda online 001">
+        </div>
+      </div>
+
+      <input type="submit" class="btn btn-primary btn-lg" value="Finalizar Venda">
+      <a th:href="@{/venda/list}" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+  </div>
+</main>
+</html>

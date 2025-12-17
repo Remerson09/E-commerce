@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <head th:replace="~{fragments/head :: head('Cadastro de Produto')}"></head>
+</head>
+
+<main>
+    <div class="container py-4">
+        <h1 th:text="${produto.id == null ? 'Cadastrar Novo Produto' : 'Editar Produto'}"></h1>
+
+        <form th:action="@{/produto/save}" th:object="${produto}" method="post">
+
+            <input th:if="${produto.id != null}" type="hidden" th:field="*{id}">
+
+            <div class="mb-3">
+                <label for="descricaoInput" class="form-label">Descrição do Produto:</label>
+                <input id="descricaoInput" type="text" class="form-control" th:field="*{descricao}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="valorInput" class="form-label">Valor (R$):</label>
+                <input id="valorInput" type="number" step="0.01" class="form-control" th:field="*{valor}" required>
+            </div>
+
+            <input type="submit" class="btn btn-success btn-lg" value="Salvar Produto">
+            <a th:href="@{/produto/list}" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
+</main>
+</html>

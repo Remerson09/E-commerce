@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}">
+
+<head>
+  <head th:replace="~{fragments/head :: head('Detalhes da Venda')}"></head>
+</head>
+
+<main>
+
+  <div class="container mt-4" th:object="${venda}">
+    <h1 class="mb-4">Detalhes da Venda #<span th:text="*{id}">1</span></h1>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        Informações da Transação
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <strong>Cliente:</strong>
+          <span th:text="*{cliente.nome != null ? cliente.nome : cliente.razaoSocial}">Nome do Cliente</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Data/Hora:</strong>
+          <span th:text="${#temporals.format(venda.dataVenda, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Descrição:</strong>
+          <span th:text="*{descricao}">Venda padrão</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Valor Total:</strong>
+          <span class="badge bg-success fs-5" th:text="${#numbers.formatCurrency(venda.total)}">R$ 0,00</span>
+        </li>
+      </ul>
+    </div>
+
+    <h2 class="mt-5 mb-3">Itens da Venda</h2>
+
+    <div th:if="*{itens == null or #lists.isEmpty(itens)}" class="alert alert-warning">
+      Esta venda não possui itens registrados.
+    </div>
+
+    <div th:if="*{itens != null and !#lists.isEmpty(itens)}">
+      <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+          <th>ID Item</th>
+          <th>Produto</th>
+          <th>Preço Unitário</th>
+          <th>Quantidade</th>
+          <th>Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : *{itens}">
+          <td th:text="${item.id}">1</td>
+          <td th:text="${item.produto.descricao}">Produto X</td>
+          <td th:text="${#numbers.formatCurrency(item.precoUnitario)}">R$ 10,00</td>
+          <td th:text="${item.quantidade}">5</td>
+          <td th:text="${#numbers.formatCurrency(item.total)}">R$ 50,00</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <a th:href="@{/vendas/list}" class="btn btn-secondary mt-3">Voltar para a Lista</a>
+  </div>
+
+</main>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="~{fragments/head :: head('Vendas do Cliente')}"></head>
+</head>
+<main>
+    <div class="container py-4">
+        <h1 class="mb-4">Vendas do Cliente: <span th:text="${cliente.nome != null ? cliente.nome : cliente.razaoSocial}"></span></h1>
+
+        <div th:if="${vendas != null and !#lists.isEmpty(vendas)}">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID da Venda</th>
+                    <th>Data da Venda</th>
+                    <th>Total da Venda</th>
+                    <th>Descrição</th>
+                    <th>Detalhes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="venda : ${vendas}">
+                    <td th:text="${venda.id}">1</td>
+                    <td th:text="${#temporals.format(venda.dataVenda, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                    <td th:text="${#numbers.formatCurrency(venda.total)}">R$ 150,00</td>
+                    <td th:text="${venda.descricao}">Venda via Carrinho</td>
+                    <td>
+                        <a th:href="@{/vendas/detalhe/{id}(id=${venda.id})}" class="btn btn-sm btn-info">Ver Detalhes</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:unless="${vendas != null and !#lists.isEmpty(vendas)}" class="alert alert-info">
+            Este cliente não possui vendas registradas.
+        </div>
+
+        <a th:href="@{/pessoa/list}" class="btn btn-secondary mt-3">Voltar para a Lista de Clientes</a>
+
+    </div>
+</main>
+</html>
