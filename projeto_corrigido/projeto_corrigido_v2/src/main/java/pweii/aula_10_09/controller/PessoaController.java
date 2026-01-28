@@ -71,26 +71,26 @@ public class PessoaController {
     @PostMapping("/savePF")
     public ModelAndView savePF(@Valid PessoaFisica pessoaFisica, BindingResult result, RedirectAttributes attr) {
 
-        // 1. Limpeza do CPF (pré-processamento)
+        // 1. Limpeza do CPF
         if (pessoaFisica.getCpf() != null) {
-            // Remove pontos e hífens do CPF
             String cpfLimpo = pessoaFisica.getCpf().replaceAll("[^0-9]", "");
             pessoaFisica.setCpf(cpfLimpo);
         }
 
         // 2. Verificação de Erros
-        // O BindingResult 'result' já capturou os erros de validação (@CPF, @NotBlank, etc.)
-        // que ocorreram APÓS a limpeza do CPF.
-        // No seu PessoaController, dentro do método savePF:
         if (result.hasErrors()) {
-            // Certifique-se de que "cadastro" é o nome correto do arquivo HTML (sem a extensão .html)
-            return new ModelAndView("cadastro");
+            // CORREÇÃO: Aponta para a pasta pessoa e o arquivo form.html
+            ModelAndView mv = new ModelAndView("pessoa/form");
+
+            // Importante: Adicione o tipoPessoa para o formulário saber que é PF
+            mv.addObject("tipoPessoa", "PF");
+            return mv;
         }
 
-        // 3. Salvamento (Executado apenas se não houver erros)
+        // 3. Salvamento
         pessoaRepository.save(pessoaFisica);
 
-        // 4. Sucesso e Redirecionamento
+        // 4. Sucesso
         attr.addFlashAttribute("success", "Pessoa Física salva com sucesso!");
         return new ModelAndView("redirect:/pessoa/list");
     }

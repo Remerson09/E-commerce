@@ -1,10 +1,11 @@
 package pweii.aula_10_09.controller;
 
-
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid; // 💡 Importante para a validação
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult; // 💡 Importante para capturar erros
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -15,7 +16,6 @@ import pweii.aula_10_09.model.entity.ItemVenda;
 import pweii.aula_10_09.model.repository.ProdutoRepository;
 
 import java.util.ArrayList;
-
 import java.util.Optional;
 
 @Transactional
@@ -29,7 +29,6 @@ public class ProdutoController {
 
     /**
      * ESSENCIAL: Cria a venda na sessão se ela não existir.
-     * Substitui a necessidade de "if (venda == null)" dentro dos métodos.
      */
     @ModelAttribute("vendaEmAndamento")
     public Venda inicializarVenda() {
@@ -37,18 +36,20 @@ public class ProdutoController {
         v.setItens(new ArrayList<>());
         return v;
     }
+
     @GetMapping("/list")
     public ModelAndView listar(ModelMap model,
                                @ModelAttribute("vendaEmAndamento") Venda vendaAtual) {
         model.addAttribute("produtos", produtoRepository.findAll());
 
-        // Soma simples das quantidades para o ícone do carrinho
+
         int carrinhoCount = vendaAtual.getItens().stream()
                 .mapToInt(item -> item.getQuantidade().intValue()).sum();
 
         model.addAttribute("carrinhoCount", carrinhoCount);
         return new ModelAndView("produto/list", model);
     }
+
     @PostMapping("/adicionar/{id}")
     public ModelAndView adicionarAoCarrinho(@PathVariable("id") Long produtoId,
                                             @RequestParam("quantidade") int quantidade,
@@ -62,16 +63,13 @@ public class ProdutoController {
             return new ModelAndView("redirect:/produto/list");
         }
 
-        // Busca se o produto já está na lista da venda
         Optional<ItemVenda> itemExistente = vendaAtual.getItens().stream()
                 .filter(item -> item.getProduto().getId().equals(produtoId))
                 .findFirst();
 
         if (itemExistente.isPresent()) {
-            // Se já existe, apenas aumenta a quantidade
             itemExistente.get().setQuantidade(itemExistente.get().getQuantidade() + quantidade);
         } else {
-            // Se é novo, cria o ItemVenda e adiciona na lista da vendaAtual
             ItemVenda novoItem = new ItemVenda();
             novoItem.setProduto(produto);
             novoItem.setQuantidade((double) quantidade);
@@ -84,6 +82,7 @@ public class ProdutoController {
     }
 
     // --- CRUD BÁSICO ---
+
     @GetMapping("/form")
     public String form(Produto produto) {
         return "produto/form";
@@ -91,21 +90,47 @@ public class ProdutoController {
 
     @GetMapping("/edit/{id}")
     public ModelAndView edit(@PathVariable("id") Long id, ModelMap model) {
-        model.addAttribute("produto", produtoRepository.findById(id).orElse(null));
+        Produto produto = produtoRepository.findById(id).orElse(null);
+        model.addAttribute("produto", produto);
         return new ModelAndView("produto/form", model);
     }
 
-    @PostMapping({"/save", "/update"})
-    public String save(Produto produto, RedirectAttributes attr) {
+    /**
+     * MÉTODO SEPARADO: SALVAR (INSERT)
+     */
+    @PostMapping("/save")
+    public String save(@Valid Produto produto, BindingResult result, RedirectAttributes attr) {
+        if (result.hasErrors()) {
+            // Retorna para o formulário se houver erros de validação
+            return "produto/form";
+        }
         produtoRepository.save(produto);
-        attr.addFlashAttribute("success", "Operação realizada com sucesso!");
+        attr.addFlashAttribute("success", "Produto cadastrado com sucesso!");
+        return "redirect:/produto/list";
+    }
+
+    /**
+     * MÉTODO SEPARADO: ATUALIZAR (UPDATE)
+     */
+    @PostMapping("/update")
+    public String update(@Valid Produto produto, BindingResult result, RedirectAttributes attr) {
+        if (result.hasErrors()) {
+            // Retorna para o formulário se houver erros de validação
+            return "produto/form";
+        }
+        produtoRepository.save(produto);
+        attr.addFlashAttribute("success", "Produto atualizado com sucesso!");
         return "redirect:/produto/list";
     }
 
     @GetMapping("/remove/{id}")
     public String remove(@PathVariable("id") Long id, RedirectAttributes attr) {
-        produtoRepository.deleteById(id);
-        attr.addFlashAttribute("success", "Produto removido!");
+        try {
+            produtoRepository.deleteById(id);
+            attr.addFlashAttribute("success", "Produto removido!");
+        } catch (Exception e) {
+            attr.addFlashAttribute("error", "Não é possível remover um produto vinculado a vendas.");
+        }
         return "redirect:/produto/list";
     }
 }

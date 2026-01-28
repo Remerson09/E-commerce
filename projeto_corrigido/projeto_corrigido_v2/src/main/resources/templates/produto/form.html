@@ -10,21 +10,28 @@
     <div class="container py-4">
         <h1 th:text="${produto.id == null ? 'Cadastrar Novo Produto' : 'Editar Produto'}"></h1>
 
-        <form th:action="@{/produto/save}" th:object="${produto}" method="post">
+        <form th:action="${produto.id == null} ? @{/produto/save} : @{/produto/update}"
+              th:object="${produto}" method="post" novalidate>
 
-            <input th:if="${produto.id != null}" type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{id}">
 
             <div class="mb-3">
                 <label for="descricaoInput" class="form-label">Descrição do Produto:</label>
-                <input id="descricaoInput" type="text" class="form-control" th:field="*{descricao}" required>
+                <input id="descricaoInput" type="text" class="form-control"
+                       th:field="*{descricao}"
+                       th:classappend="${#fields.hasErrors('descricao')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></div>
             </div>
 
             <div class="mb-3">
                 <label for="valorInput" class="form-label">Valor (R$):</label>
-                <input id="valorInput" type="number" step="0.01" class="form-control" th:field="*{valor}" required>
+                <input id="valorInput" type="number" step="0.01" class="form-control"
+                       th:field="*{valor}"
+                       th:classappend="${#fields.hasErrors('valor')} ? 'is-invalid' : ''">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}"></div>
             </div>
 
-            <input type="submit" class="btn btn-success btn-lg" value="Salvar Produto">
+            <button type="submit" class="btn btn-success btn-lg">Salvar Produto</button>
             <a th:href="@{/produto/list}" class="btn btn-secondary ms-2">Cancelar</a>
         </form>
     </div>
