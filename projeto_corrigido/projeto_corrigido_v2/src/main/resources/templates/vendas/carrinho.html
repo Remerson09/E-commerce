@@ -18,18 +18,24 @@
 
         <div th:unless="${vendaAtual == null or vendaAtual.itens.isEmpty()}">
 
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Preço Unitário</th>
-                    <th>Quantidade</th>
-                    <th>Subtotal</th>
-                    <th>Ação</th>
-                </tr>
-                </thead>
+            <table class="table table-striped align-middle"> <thead>
+            <tr>
+                <th>item</th> <th>Produto</th>
+                <th>Preço Unitário</th>
+                <th>Quantidade</th>
+                <th>Subtotal</th>
+                <th>Ação</th>
+            </tr>
+            </thead>
                 <tbody>
                 <tr th:each="item : ${vendaAtual.itens}">
+                    <td>
+                        <img th:src="${item.produto.imagemUrl != null and !item.produto.imagemUrl.isEmpty() ? item.produto.imagemUrl : 'https://images.tcdn.com.br/img/img_prod/1303842/cafe_torrado_e_moido_500gr_torra_media_77_2_dd6c41c3b45515dafc757784acce0c19.jpg'}"
+                             alt="Foto"
+                             class="img-thumbnail"
+                             style="width: 60px; height: 60px; object-fit: contain; background-color: #fff;">
+                    </td>
+
                     <td th:text="${item.produto.descricao}">Produto A</td>
                     <td th:text="${#numbers.formatCurrency(item.produto.valor)}">R$ 10.00</td>
                     <td th:text="${#numbers.formatDecimal(item.quantidade, 1, 2, 'POINT')}">2</td>
@@ -37,43 +43,56 @@
                     <td th:with="subtotal=${item.quantidade * item.produto.valor}"
                         th:text="${#numbers.formatCurrency(subtotal)}">R$ 20.00</td>
                     <td>
-                        <a th:href="@{/vendas/removerItem/{id}(id=${item.produto.id})}" class="btn btn-sm btn-danger">Remover</a>
+                        <a th:href="@{/vendas/removerItem/{id}(id=${item.produto.id})}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Remover
+                        </a>
                     </td>
                 </tr>
                 </tbody>
             </table>
 
             <div class="d-flex justify-content-end mb-4">
-                <h4>
-                    Total da Venda:
-                    <span class="text-primary" th:text="${#numbers.formatCurrency(totalVenda)}">R$ 150,00</span>
-                </h4>
+                <div class="card p-3 shadow-sm bg-light">
+                    <h4 class="mb-0">
+                        Total da Venda:
+                        <span class="text-primary fw-bold" th:text="${#numbers.formatCurrency(totalVenda)}">R$ 150,00</span>
+                    </h4>
+                </div>
             </div>
 
             <hr/>
 
-            <h3>Finalizar Venda</h3>
-            <form th:action="@{/vendas/finalizar}" method="post">
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Finalizar Venda</h3>
+                    <form th:action="@{/vendas/finalizar}" method="post">
 
-                <div class="mb-3">
-                    <label for="cliente" class="form-label">Cliente</label>
-                    <select id="cliente" name="clienteId" class="form-select" required>
-                        <option value="">Selecione o Cliente</option>
-                        <option th:each="cliente : ${clientes}"
-                                th:value="${cliente.id}"
-                                th:text="${cliente.nome}">Nome do Cliente</option>
-                    </select>
+                        <div class="mb-3">
+                            <label for="cliente" class="form-label fw-bold">Cliente</label>
+                            <select id="cliente" name="clienteId" class="form-select border-primary" required>
+                                <option value="">Selecione o Cliente</option>
+                                <option th:each="cliente : ${clientes}"
+                                        th:value="${cliente.id}"
+                                        th:text="${cliente.nome}">Nome do Cliente</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="descricao" class="form-label fw-bold">Descrição da Venda (Opcional)</label>
+                            <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Ex: Venda à vista ou observações">
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="bi bi-check-lg"></i> Finalizar Compra
+                            </button>
+                            <a th:href="@{/produto/list}" class="btn btn-outline-secondary btn-lg">
+                                Continuar Comprando
+                            </a>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label for="descricao" class="form-label">Descrição da Venda (Opcional)</label>
-                    <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Ex: Venda à vista">
-                </div>
-
-                <button type="submit" class="btn btn-success btn-lg">
-                    <i class="bi bi-wallet2"></i> Finalizar Compra
-                </button>
-            </form>
+            </div>
 
         </div>
     </div>

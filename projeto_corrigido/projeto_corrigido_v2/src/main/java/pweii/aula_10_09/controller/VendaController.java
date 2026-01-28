@@ -1,6 +1,6 @@
 package pweii.aula_10_09.controller;
 
-import jakarta.servlet.http.HttpSession;
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +16,7 @@ import pweii.aula_10_09.model.repository.VendaRepository;
 import pweii.aula_10_09.model.repository.PessoaRepository;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -42,10 +43,16 @@ public class VendaController {
     @GetMapping("/carrinho")
     public ModelAndView verCarrinho(@ModelAttribute("vendaEmAndamento") Venda venda, ModelMap model) {
 
+        // Cálculo manual do total percorrendo os itens do carrinho
+        BigDecimal totalCalculado = venda.getItens().stream()
+                .map(item -> item.getProduto().getValor().multiply(BigDecimal.valueOf(item.getQuantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         model.addAttribute("vendaAtual", venda);
         model.addAttribute("clientes", pessoaRepository.findAll());
-        model.addAttribute("totalVenda", venda.getTotal());
+
+        // Enviando o total calculado para a variável que o HTML espera
+        model.addAttribute("totalVenda", totalCalculado);
 
         return new ModelAndView("vendas/carrinho", model);
     }
@@ -61,23 +68,24 @@ public class VendaController {
             return "redirect:/vendas/carrinho";
         }
 
-        // Preenche os dados da venda
+        // 🔥 IMPORTANTE: Se o ID vier preenchido de um SQL antigo, o Hibernate dará erro.
+        // Se a intenção é sempre uma venda nova, garantimos o ID nulo:
+        venda.setId(null);
+
         venda.setDataVenda(LocalDateTime.now());
         venda.setDescricao(descricao);
         venda.setCliente(pessoaRepository.findById(clienteId).orElse(null));
 
-        // Prepara os itens (vincula à venda e fixa o preço atual)
         for (ItemVenda item : venda.getItens()) {
             item.setVenda(venda);
             item.setPrecoUnitario(item.getProduto().getValor());
+            item.setId(null); // Garante que os itens também sejam inserções novas
         }
 
         vendaRepository.save(venda);
+        status.setComplete(); // Limpa a @SessionAttributes
 
-        //Remove o objeto "vendaEmAndamento" da sessão
-        status.setComplete();
-
-        attr.addFlashAttribute("success", "Venda finalizada!");
+        attr.addFlashAttribute("success", "Venda finalizada com sucesso!");
         return "redirect:/vendas/list";
     }
 

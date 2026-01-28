@@ -1,49 +1,67 @@
-<header class="container" th:fragment="header">
+<header class="container"
+        th:fragment="header"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
+
             <a class="navbar-brand" th:href="@{/produto/list}">Minha App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{/produto/list}">Produtos</a>
+                        <a class="nav-link active" th:href="@{/produto/list}">Produtos</a>
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- SOMENTE ADMIN -->
+                    <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown">
                             Ações
                         </a>
+
                         <ul class="dropdown-menu">
 
                             <li><h6 class="dropdown-header">Clientes</h6></li>
-                            <li><a class="dropdown-item" th:href="@{/pessoa/list}">Listar Pessoas/Clientes</a></li>
+                            <li><a class="dropdown-item" th:href="@{/pessoa/list}">Listar Pessoas</a></li>
                             <li><a class="dropdown-item" th:href="@{/pessoa/formPF}">Cadastrar Pessoa Física</a></li>
                             <li><a class="dropdown-item" th:href="@{/pessoa/formPJ}">Cadastrar Pessoa Jurídica</a></li>
 
                             <li><hr class="dropdown-divider"></li>
 
                             <li><h6 class="dropdown-header">Produtos</h6></li>
-                            <li><a class="dropdown-item" th:href="@{/produto/form}">Cadastrar novo produto</a></li>
-                            <li><a class="dropdown-item" th:href="@{/produto/list}">Lista de Intens</a></li>
+                            <li><a class="dropdown-item" th:href="@{/produto/form}">Cadastrar Produto</a></li>
+                            <li><a class="dropdown-item" th:href="@{/produto/list}">Lista de Itens</a></li>
+
                             <li><hr class="dropdown-divider"></li>
 
                             <li><h6 class="dropdown-header">Compras</h6></li>
-
                             <li><a class="dropdown-item" th:href="@{/vendas/list}">Histórico de Vendas</a></li>
-
 
                         </ul>
                     </li>
                 </ul>
-
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Buscar..." aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Buscar</button>
-                </form>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item me-3" sec:authorize="isAuthenticated()">
+                        <span class="navbar-text"> Olá, <strong sec:authentication="name"></strong></span>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Sair
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
