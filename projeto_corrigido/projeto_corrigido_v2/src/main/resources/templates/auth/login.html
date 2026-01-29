@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Login | Meu E-commerce</title>
+    <title>Login | Minha Loja</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
     <style>
         body {
-            background-color: #f8f9fa; /* Cinza bem claro */
+            background-color: #f8f9fa;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -38,9 +39,6 @@
             background-color: #0b5ed7;
             transform: translateY(-1px);
         }
-        .form-label {
-            font-weight: 500;
-        }
     </style>
 </head>
 
@@ -51,7 +49,7 @@
 
         <div class="text-center mb-4">
             <h3 class="fw-bold text-primary">Bem-vindo</h3>
-            <p class="text-muted">Acesse sua conta de cliente</p>
+            <p class="text-muted">Acesse sua conta para comprar</p>
         </div>
 
         <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -59,18 +57,23 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show" role="alert">
+            Você saiu com sucesso.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <div class="card-body p-0">
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Usuário</label>
+                    <label for="username" class="form-label fw-bold">Usuário</label>
                     <input type="text" class="form-control" id="username" name="username"
-                           placeholder="Ex: joao.silva" required autofocus>
+                           placeholder="Seu login" required autofocus>
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label">Senha</label>
+                    <label for="password" class="form-label fw-bold">Senha</label>
                     <input type="password" class="form-control" id="password" name="password"
-                           placeholder="Digite sua senha" required>
+                           placeholder="Sua senha" required>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
@@ -78,8 +81,23 @@
                 </div>
             </form>
 
-            <div class="text-center mt-3">
-                <small class="text-muted">Não tem conta? <a href="#" class="text-decoration-none">Cadastre-se</a></small>
+            <hr class="my-4">
+
+            <div class="text-center">
+                <p class="mb-2">Ainda não tem conta?</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a th:href="@{/pessoa/formPF}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-person"></i> Pessoa Física
+                    </a>
+                    <a th:href="@{/pessoa/formPJ}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-building"></i> Pessoa Jurídica
+                    </a>
+                </div>
+                <div class="mt-3">
+                    <a th:href="@{/produto/list}" class="text-decoration-none small">
+                        <i class="bi bi-arrow-left"></i> Voltar para a loja
+                    </a>
+                </div>
             </div>
         </div>
     </div>

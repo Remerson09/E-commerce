@@ -1,12 +1,14 @@
 <header class="container"
         th:fragment="header"
         xmlns:th="http://www.thymeleaf.org"
-        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
         <div class="container-fluid">
 
-            <a class="navbar-brand" th:href="@{/produto/list}">Minha App</a>
+            <a class="navbar-brand fw-bold text-primary" th:href="@{/produto/list}">
+                <i class="bi bi-shop"></i> Minha Loja
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent">
@@ -15,55 +17,80 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/produto/list}">Produtos</a>
+                        <a class="nav-link" th:href="@{/produto/list}">Produtos</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/vendas/list}">Minhas Compras</a>
                     </li>
 
                     <!-- SOMENTE ADMIN -->
                     <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
                         <a class="nav-link dropdown-toggle" href="#" role="button"
                            data-bs-toggle="dropdown">
-                            Ações
+                            Administração
                         </a>
 
                         <ul class="dropdown-menu">
-
-                            <li><h6 class="dropdown-header">Clientes</h6></li>
-                            <li><a class="dropdown-item" th:href="@{/pessoa/list}">Listar Pessoas</a></li>
-                            <li><a class="dropdown-item" th:href="@{/pessoa/formPF}">Cadastrar Pessoa Física</a></li>
-                            <li><a class="dropdown-item" th:href="@{/pessoa/formPJ}">Cadastrar Pessoa Jurídica</a></li>
+                            <li><h6 class="dropdown-header">Gestão de Clientes</h6></li>
+                            <li><a class="dropdown-item" th:href="@{/pessoa/list}">Listar Clientes</a></li>
 
                             <li><hr class="dropdown-divider"></li>
 
-                            <li><h6 class="dropdown-header">Produtos</h6></li>
+                            <li><h6 class="dropdown-header">Gestão de Produtos</h6></li>
                             <li><a class="dropdown-item" th:href="@{/produto/form}">Cadastrar Produto</a></li>
-                            <li><a class="dropdown-item" th:href="@{/produto/list}">Lista de Itens</a></li>
 
                             <li><hr class="dropdown-divider"></li>
 
-                            <li><h6 class="dropdown-header">Compras</h6></li>
-                            <li><a class="dropdown-item" th:href="@{/vendas/list}">Histórico de Vendas</a></li>
-
+                            <li><h6 class="dropdown-header">Relatórios</h6></li>
+                            <li><a class="dropdown-item" th:href="@{/vendas/list}">Todas as Vendas</a></li>
                         </ul>
                     </li>
                 </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item me-3" sec:authorize="isAuthenticated()">
-                        <span class="navbar-text"> Olá, <strong sec:authentication="name"></strong></span>
+
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Carrinho sempre visível -->
+                    <li class="nav-item me-3">
+                        <a th:href="@{/vendas/carrinho}" class="btn btn-outline-primary position-relative">
+                            <i class="bi bi-cart-fill"></i>
+                            <span th:if="${carrinhoCount != null and carrinhoCount > 0}"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  th:text="${carrinhoCount}">0</span>
+                        </a>
                     </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <form th:action="@{/logout}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="bi bi-box-arrow-right"></i> Sair
-                            </button>
-                        </form>
+
+                    <!-- Usuário Autenticado -->
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Olá, <strong sec:authentication="name"></strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <form th:action="@{/logout}" method="post" class="px-3 py-2">
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        <i class="bi bi-box-arrow-right"></i> Sair
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Usuário Não Autenticado -->
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/login}" class="btn btn-primary btn-sm me-2">Entrar</a>
+                    </li>
+                    <li class="nav-item dropdown" sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-outline-secondary btn-sm dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Cadastre-se
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/pessoa/formPF}">Pessoa Física</a></li>
+                            <li><a class="dropdown-item" th:href="@{/pessoa/formPJ}">Pessoa Jurídica</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
 </header>
