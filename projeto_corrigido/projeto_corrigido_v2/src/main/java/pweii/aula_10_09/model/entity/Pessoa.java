@@ -50,4 +50,7 @@ public abstract class Pessoa {
         this.telefone = telefone;
 
     }
+    @ManyToOne // ou @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 }

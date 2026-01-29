@@ -3,83 +3,87 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <head th:replace="~{fragments/head :: head('Cadastro de Pessoa')}"></head>
+    <head th:replace="~{fragments/head :: head('Cadastro de Cliente')}"></head>
 </head>
 
 <main>
-    <div class="container py-4">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i th:class="${tipoPessoa == 'PF'} ? 'bi bi-person-plus' : 'bi bi-building'"></i>
+                            <span th:text="${tipoPessoa == 'PF'} ? 'Cadastro de Pessoa Física' : 'Cadastro de Pessoa Jurídica'">Cadastro</span>
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
 
-        <h1 th:if="${tipoPessoa == 'PF'}"
-            th:text="${pessoaFisica != null and pessoaFisica.id != null} ? 'Edição de Pessoa Física' : 'Cadastro de Pessoa Física'">Cadastro de PF</h1>
+                        <!-- Mensagens de Erro -->
+                        <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
 
-        <h1 th:if="${tipoPessoa == 'PJ'}"
-            th:text="${pessoaJuridica != null and pessoaJuridica.id != null} ? 'Edição de Pessoa Jurídica' : 'Cadastro de Pessoa Jurídica'">Cadastro de PJ</h1>
+                        <form th:action="${tipoPessoa == 'PF'} ? @{/pessoa/savePF} : @{/pessoa/savePJ}" method="post">
 
-        <div th:if="${tipoPessoa == 'PF'}">
-            <form th:action="${pessoaFisica.id == null} ? @{/pessoa/savePF} : @{/pessoa/updatePF}"
-                  th:object="${pessoaFisica}"
-                  method="post">
+                            <h5 class="mb-3 text-muted border-bottom pb-2">Dados Pessoais</h5>
 
-                <input type="hidden" th:field="*{id}">
+                            <div th:if="${tipoPessoa == 'PF'}">
+                                <div class="mb-3">
+                                    <label for="nome" class="form-label fw-bold">Nome Completo</label>
+                                    <input type="text" id="nome" name="nome" class="form-control" th:value="${pessoaFisica.nome}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cpf" class="form-label fw-bold">CPF</label>
+                                    <input type="text" id="cpf" name="cpf" class="form-control" th:value="${pessoaFisica.cpf}" placeholder="000.000.000-00" required>
+                                </div>
+                            </div>
 
-                <div class="mb-3">
-                    <label for="nomeInput" class="form-label">Nome:</label>
-                    <input id="nomeInput" class="form-control" type="text" th:field="*{nome}" placeholder="Nome Completo" required>
+                            <div th:if="${tipoPessoa == 'PJ'}">
+                                <div class="mb-3">
+                                    <label for="razaoSocial" class="form-label fw-bold">Razão Social</label>
+                                    <input type="text" id="razaoSocial" name="razaoSocial" class="form-control" th:value="${pessoaJuridica.razaoSocial}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cnpj" class="form-label fw-bold">CNPJ</label>
+                                    <input type="text" id="cnpj" name="cnpj" class="form-control" th:value="${pessoaJuridica.cnpj}" placeholder="00.000.000/0000-00" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label fw-bold">E-mail</label>
+                                    <input type="email" id="email" name="email" class="form-control" th:value="${tipoPessoa == 'PF' ? pessoaFisica.email : pessoaJuridica.email}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="telefone" class="form-label fw-bold">Telefone</label>
+                                    <input type="text" id="telefone" name="telefone" class="form-control" th:value="${tipoPessoa == 'PF' ? pessoaFisica.telefone : pessoaJuridica.telefone}" placeholder="(00) 00000-0000" required>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 mt-4 text-muted border-bottom pb-2">Dados de Acesso</h5>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="login" class="form-label fw-bold">Nome de Usuário (Login)</label>
+                                    <input type="text" id="login" name="login" class="form-control" placeholder="Ex: joao.silva" required>
+                                    <small class="text-muted">Este será seu nome de acesso ao sistema.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label fw-bold">Senha</label>
+                                    <input type="password" id="password" name="password" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Finalizar Cadastro
+                                </button>
+                                <a th:href="@{/login}" class="btn btn-outline-secondary">Já tenho uma conta</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="cpfInput" class="form-label">CPF:</label>
-                    <input id="cpfInput" class="form-control" type="text" th:field="*{cpf}" placeholder="000.000.000-00" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">Email:</label>
-                    <input id="emailInput" class="form-control" type="email" th:field="*{email}" placeholder="exemplo@dominio.com" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="telefoneInput" class="form-label">Telefone:</label>
-                    <input id="telefoneInput" class="form-control" type="text" th:field="*{telefone}" placeholder="(99) 99999-9999" required>
-                </div>
-
-                <input type="submit" class="btn btn-success" th:value="${pessoaFisica.id == null} ? 'Salvar PF' : 'Atualizar PF'">
-            </form>
+            </div>
         </div>
-
-
-        <div th:if="${tipoPessoa == 'PJ'}">
-            <form th:action="${pessoaJuridica.id == null} ? @{/pessoa/savePJ} : @{/pessoa/updatePJ}"
-                  th:object="${pessoaJuridica}"
-                  method="post">
-
-                <input type="hidden" th:field="*{id}">
-
-                <div class="mb-3">
-                    <label for="razaoSocialInput" class="form-label">Razão Social:</label>
-                    <input id="razaoSocialInput" class="form-control" type="text" th:field="*{razaoSocial}" placeholder="Razão Social" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="cnpjInput" class="form-label">CNPJ:</label>
-                    <input id="cnpjInput" class="form-control" type="text" th:field="*{cnpj}" placeholder="00.000.000/0000-00" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="emailInputPJ" class="form-label">Email:</label>
-                    <input id="emailInputPJ" class="form-control" type="email" th:field="*{email}" placeholder="contato@empresa.com.br" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="telefoneInputPJ" class="form-label">Telefone:</label>
-                    <input id="telefoneInputPJ" class="form-control" type="text" th:field="*{telefone}" placeholder="(99) 9999-9999" required>
-                </div>
-
-                <input type="submit" class="btn btn-success" th:value="${pessoaJuridica.id == null} ? 'Salvar PJ' : 'Atualizar PJ'">
-            </form>
-        </div>
-
-        <br>
-        <a th:href="@{/pessoa/list}">Voltar para Lista de Pessoas</a>
     </div>
 </main>
 </html>

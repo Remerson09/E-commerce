@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{fragments/layout :: layout(~{::head}, ~{::main})}">
 <head>
     <head th:replace="~{fragments/head :: head('Carrinho de Compras')}"></head>
@@ -18,38 +19,42 @@
 
         <div th:unless="${vendaAtual == null or vendaAtual.itens.isEmpty()}">
 
-            <table class="table table-striped align-middle"> <thead>
-            <tr>
-                <th>item</th> <th>Produto</th>
-                <th>Preço Unitário</th>
-                <th>Quantidade</th>
-                <th>Subtotal</th>
-                <th>Ação</th>
-            </tr>
-            </thead>
-                <tbody>
-                <tr th:each="item : ${vendaAtual.itens}">
-                    <td>
-                        <img th:src="${item.produto.imagemUrl != null and !item.produto.imagemUrl.isEmpty() ? item.produto.imagemUrl : 'https://images.tcdn.com.br/img/img_prod/1303842/cafe_torrado_e_moido_500gr_torra_media_77_2_dd6c41c3b45515dafc757784acce0c19.jpg'}"
-                             alt="Foto"
-                             class="img-thumbnail"
-                             style="width: 60px; height: 60px; object-fit: contain; background-color: #fff;">
-                    </td>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Item</th>
+                        <th>Produto</th>
+                        <th>Preço Unitário</th>
+                        <th>Quantidade</th>
+                        <th>Subtotal</th>
+                        <th>Ação</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${vendaAtual.itens}">
+                        <td>
+                            <img th:src="${item.produto.imagemUrl != null and !item.produto.imagemUrl.isEmpty() ? item.produto.imagemUrl : 'https://via.placeholder.com/60'}"
+                                 alt="Foto"
+                                 class="img-thumbnail"
+                                 style="width: 60px; height: 60px; object-fit: contain;">
+                        </td>
 
-                    <td th:text="${item.produto.descricao}">Produto A</td>
-                    <td th:text="${#numbers.formatCurrency(item.produto.valor)}">R$ 10.00</td>
-                    <td th:text="${#numbers.formatDecimal(item.quantidade, 1, 2, 'POINT')}">2</td>
+                        <td th:text="${item.produto.descricao}">Produto A</td>
+                        <td th:text="${#numbers.formatCurrency(item.produto.valor)}">R$ 10.00</td>
+                        <td th:text="${#numbers.formatDecimal(item.quantidade, 1, 0, 'POINT')}">2</td>
 
-                    <td th:with="subtotal=${item.quantidade * item.produto.valor}"
-                        th:text="${#numbers.formatCurrency(subtotal)}">R$ 20.00</td>
-                    <td>
-                        <a th:href="@{/vendas/removerItem/{id}(id=${item.produto.id})}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Remover
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                        <td th:with="subtotal=${item.quantidade * item.produto.valor}"
+                            th:text="${#numbers.formatCurrency(subtotal)}">R$ 20.00</td>
+                        <td>
+                            <a th:href="@{/vendas/removerItem/{id}(id=${item.produto.id})}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Remover
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="d-flex justify-content-end mb-4">
                 <div class="card p-3 shadow-sm bg-light">
@@ -62,24 +67,14 @@
 
             <hr/>
 
-            <div class="card shadow-sm border-0 mb-5">
+            <!-- Se o usuário estiver LOGADO -->
+            <div sec:authorize="isAuthenticated()" class="card shadow-sm border-0 mb-5">
                 <div class="card-body p-4">
                     <h3 class="card-title mb-4">Finalizar Venda</h3>
                     <form th:action="@{/vendas/finalizar}" method="post">
-
-                        <div class="mb-3">
-                            <label for="cliente" class="form-label fw-bold">Cliente</label>
-                            <select id="cliente" name="clienteId" class="form-select border-primary" required>
-                                <option value="">Selecione o Cliente</option>
-                                <option th:each="cliente : ${clientes}"
-                                        th:value="${cliente.id}"
-                                        th:text="${cliente.nome}">Nome do Cliente</option>
-                            </select>
-                        </div>
-
                         <div class="mb-4">
                             <label for="descricao" class="form-label fw-bold">Descrição da Venda (Opcional)</label>
-                            <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Ex: Venda à vista ou observações">
+                            <input type="text" id="descricao" name="descricao" class="form-control" placeholder="Ex: Entrega no período da tarde">
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
@@ -91,6 +86,31 @@
                             </a>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Se o usuário NÃO estiver logado -->
+            <div sec:authorize="!isAuthenticated()" class="alert alert-warning shadow-sm p-4 mb-5 border-start border-4 border-warning">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-1 me-4 text-warning"></i>
+                    <div>
+                        <h4 class="alert-heading fw-bold">Atenção!</h4>
+                        <p class="mb-3">Para finalizar sua compra, você precisa estar logado em sua conta.</p>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/login}" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                            </a>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Ainda não tenho conta
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" th:href="@{/pessoa/formPF}">Cadastrar como Pessoa Física</a></li>
+                                    <li><a class="dropdown-item" th:href="@{/pessoa/formPJ}">Cadastrar como Pessoa Jurídica</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
