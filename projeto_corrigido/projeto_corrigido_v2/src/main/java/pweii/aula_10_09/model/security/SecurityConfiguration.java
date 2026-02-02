@@ -29,7 +29,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
 
                         // 2. Cadastro de pessoa física e jurídica aberto para novos usuários
-                        .requestMatchers("/pessoa/formPF", "/pessoa/formPJ", "/pessoa/savePF", "/pessoa/savePJ").permitAll()
+                        .requestMatchers("/pessoa/form", "/pessoa/save").permitAll()
 
                         // 3. Visualização de produtos e carrinho pública
                         .requestMatchers("/", "/produto/list", "/vendas/carrinho", "/produto/adicionar/**", "/vendas/removerItem/**").permitAll()

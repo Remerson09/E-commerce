@@ -21,9 +21,10 @@ import lombok.Setter;
 public class PessoaJuridica extends Pessoa {
 
     @NotBlank(message = "O CNPJ é obrigatório.")
-    @Size(max = 18, message = "O CNPJ não pode ter mais que 18 caracteres (incluindo formatação).")
-    @Pattern(regexp = "^\\\\d{2}\\\\.\\\\d{3}\\\\.\\\\d{3}/\\\\d{4}-\\\\d{2}$|^\\\\d{14}$", message = "CNPJ inválido. Use o formato XX.XXX.XXX/YYYY-ZZ ou apenas 14 dígitos.")
-    @Column(nullable = true, unique = true, length = 18)
+    @Size(max = 18, message = "O CNPJ não pode ter mais que 18 caracteres.")
+    @Pattern(regexp = "(^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$)|(^\\d{14}$)",
+            message = "CNPJ inválido. Use o formato XX.XXX.XXX/YYYY-ZZ ou apenas 14 dígitos.")
+    @Column(unique = true, length = 18)
     private String cnpj;
 
     @Column(nullable = true)

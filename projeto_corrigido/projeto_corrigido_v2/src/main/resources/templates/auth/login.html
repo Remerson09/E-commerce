@@ -62,6 +62,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
         <div class="card-body p-0">
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">
@@ -85,12 +87,9 @@
 
             <div class="text-center">
                 <p class="mb-2">Ainda não tem conta?</p>
-                <div class="d-flex justify-content-center gap-2">
-                    <a th:href="@{/pessoa/formPF}" class="btn btn-outline-success btn-sm">
-                        <i class="bi bi-person"></i> Pessoa Física
-                    </a>
-                    <a th:href="@{/pessoa/formPJ}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-building"></i> Pessoa Jurídica
+                <div class="d-grid gap-2">
+                    <a th:href="@{/pessoa/form}" class="btn btn-outline-success">
+                        <i class="bi bi-person-plus"></i> Cadastre-se agora
                     </a>
                 </div>
                 <div class="mt-3">

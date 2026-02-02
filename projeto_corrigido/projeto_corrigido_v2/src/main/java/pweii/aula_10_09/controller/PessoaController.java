@@ -1,14 +1,12 @@
 package pweii.aula_10_09.controller;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -37,6 +35,7 @@ public class PessoaController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    // Mantém os objetos no modelo para as telas de edição
     @ModelAttribute
     public void addAttributes(ModelMap model) {
         if (!model.containsAttribute("pessoaFisica")) {
@@ -47,110 +46,85 @@ public class PessoaController {
         }
     }
 
-    @GetMapping("/formPF")
-    public String formPF(ModelMap model) {
-        model.addAttribute("tipoPessoa", "PF");
+    @GetMapping("/form")
+    public String form(ModelMap model) {
+        if (!model.containsAttribute("tipoPessoa")) {
+            model.addAttribute("tipoPessoa", "PF");
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            Usuario usuario = usuarioRepository.findByLogin(auth.getName());
+            if (usuario != null && usuario.getPessoa() == null) {
+                model.addAttribute("info", "Você está logado como " + usuario.getLogin() + ". Complete seu cadastro abaixo.");
+            }
+        }
         return "pessoa/form";
     }
 
-    @GetMapping("/formPJ")
-    public String formPJ(ModelMap model) {
-        model.addAttribute("tipoPessoa", "PJ");
-        return "pessoa/form";
-    }
+    // Método unificado para salvar vindo do formulário genérico
+    @PostMapping("/save")
+    public ModelAndView save(@RequestParam("identificador") String identificador,
+                             @RequestParam("nomeRazao") String nomeRazao,
+                             @RequestParam("email") String email,
+                             @RequestParam("telefone") String telefone,
+                             @RequestParam("login") String login,
+                             @RequestParam("password") String password,
+                             RedirectAttributes attr) {
 
-    @PostMapping("/savePF")
-    public ModelAndView savePF(@Valid PessoaFisica pessoaFisica,
-                               BindingResult result,
-                               @RequestParam("login") String login,
-                               @RequestParam("password") String password,
-                               RedirectAttributes attr) {
+        String cleanId = identificador.replaceAll("[^0-9]", "");
+        Pessoa pessoa;
 
-        if (pessoaFisica.getCpf() != null) {
-            pessoaFisica.setCpf(pessoaFisica.getCpf().replaceAll("[^0-9]", ""));
+        if (cleanId.length() == 11) {
+            PessoaFisica pf = new PessoaFisica();
+            pf.setNome(nomeRazao);
+
+            pf.setEmail(email);
+            pf.setTelefone(telefone);
+            pf.setCpf(cleanId);
+            pessoa = pf;
+        } else if (cleanId.length() == 14) {
+            PessoaJuridica pj = new PessoaJuridica();
+            pj.setRazaoSocial(nomeRazao);
+            pj.setCnpj(cleanId);
+            pj.setEmail(email);
+            pj.setTelefone(telefone);
+            pessoa = pj;
+        } else {
+            attr.addFlashAttribute("error", "CPF ou CNPJ inválido!");
+            return new ModelAndView("redirect:/pessoa/form");
         }
 
-        if (result.hasErrors()) {
-            ModelAndView mv = new ModelAndView("pessoa/form");
-            mv.addObject("tipoPessoa", "PF");
-            return mv;
-        }
-
+        // Verifica se o login já existe antes de criar
         if (usuarioRepository.findByLogin(login) != null) {
-            ModelAndView mv = new ModelAndView("pessoa/form");
-            mv.addObject("tipoPessoa", "PF");
-            mv.addObject("error", "Este login já está em uso!");
-            return mv;
+            attr.addFlashAttribute("error", "Este login já está em uso!");
+            return new ModelAndView("redirect:/pessoa/form");
         }
 
-        // 1. Primeiro criamos e salvamos o Usuário (ele precisa de um ID agora)
-        Usuario novoUsuario = criarUsuarioParaPessoa(pessoaFisica, login, password);
+        pessoaRepository.save(pessoa);
+        criarUsuarioParaPessoa(pessoa, login, password);
 
-        // 2. Vinculamos o Usuário à Pessoa
-        // Isso garante que a coluna 'usuario_id' na tabela 'pessoas' receba o valor correto
-        pessoaFisica.setUsuario(novoUsuario);
-
-        // 3. Salvamos a Pessoa por último
-        pessoaRepository.save(pessoaFisica);
-
-        attr.addFlashAttribute("success", "Cadastro realizado com sucesso! Faça login para continuar.");
+        attr.addFlashAttribute("success", "Cadastro realizado com sucesso! Faça login.");
         return new ModelAndView("redirect:/login");
     }
 
-    @PostMapping("/savePJ")
-    public ModelAndView savePJ(@Valid PessoaJuridica pessoaJuridica,
-                               BindingResult result,
-                               @RequestParam("login") String login,
-                               @RequestParam("password") String password,
-                               RedirectAttributes attr) {
-
-        if (result.hasErrors()) {
-            ModelAndView mv = new ModelAndView("pessoa/form");
-            mv.addObject("tipoPessoa", "PJ");
-            return mv;
-        }
-
-        if (usuarioRepository.findByLogin(login) != null) {
-            ModelAndView mv = new ModelAndView("pessoa/form");
-            mv.addObject("tipoPessoa", "PJ");
-            mv.addObject("error", "Este login já está em uso!");
-            return mv;
-        }
-
-        // 1. Primeiro criamos e salvamos o Usuário
-        Usuario novoUsuario = criarUsuarioParaPessoa(pessoaJuridica, login, password);
-
-        // 2. Vinculamos o Usuário à Pessoa Jurídica
-        pessoaJuridica.setUsuario(novoUsuario);
-
-        // 3. Salvamos a Pessoa (a coluna usuario_id será preenchida)
-        pessoaRepository.save(pessoaJuridica);
-
-        attr.addFlashAttribute("success", "Cadastro realizado com sucesso! Faça login para continuar.");
-        return new ModelAndView("redirect:/login");
-    }
-
-    private Usuario criarUsuarioParaPessoa(Pessoa pessoa, String login, String password) {
+    private void criarUsuarioParaPessoa(Pessoa pessoa, String login, String password) {
         Usuario usuario = new Usuario();
         usuario.setLogin(login);
         usuario.setPassword(passwordEncoder.encode(password));
-
-        // Vínculo no sentido Usuário -> Pessoa
         usuario.setPessoa(pessoa);
 
-        // Busca ou cria a Role USER
         Role roleUser = roleRepository.findByNome("ROLE_USER");
         if (roleUser == null) {
             roleUser = new Role();
             roleUser.setNome("ROLE_USER");
-            roleUser = roleRepository.save(roleUser);
+            roleRepository.save(roleUser);
         }
-
         usuario.setRoles(Collections.singletonList(roleUser));
-
-        // Salva o usuário no banco e retorna o objeto com ID gerado
-        return usuarioRepository.save(usuario);
+        usuarioRepository.save(usuario);
     }
+
+    // --- MÉTODOS DE ADMINISTRAÇÃO E VISUALIZAÇÃO ---
 
     @GetMapping("/edit/{id}")
     public ModelAndView edit(@PathVariable("id") Long id, ModelMap model) {
@@ -174,16 +148,12 @@ public class PessoaController {
 
         if (!isAdmin) return new ModelAndView("redirect:/produto/list");
 
-        List<Pessoa> pessoas;
-        if (nome != null && !nome.trim().isEmpty()) {
-            pessoas = pessoaRepository.findByNomeOrRazaoSocialContaining("%" + nome.trim() + "%");
-            model.addAttribute("nome", nome);
-        } else {
-            pessoas = pessoaRepository.findAll();
-            model.addAttribute("nome", "");
-        }
+        List<Pessoa> pessoas = (nome != null && !nome.trim().isEmpty())
+                ? pessoaRepository.findByNomeOrRazaoSocialContaining("%" + nome.trim() + "%")
+                : pessoaRepository.findAll();
 
         model.addAttribute("pessoas", pessoas);
+        model.addAttribute("nome", nome != null ? nome : "");
         return new ModelAndView("pessoa/list", model);
     }
 
@@ -197,8 +167,7 @@ public class PessoaController {
     @GetMapping("/vendas/{id}")
     public ModelAndView vendasCliente(@PathVariable("id") Long id, ModelMap model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String login = auth.getName();
-        Usuario usuario = usuarioRepository.findByLogin(login);
+        Usuario usuario = usuarioRepository.findByLogin(auth.getName());
         boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         Pessoa cliente = pessoaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));

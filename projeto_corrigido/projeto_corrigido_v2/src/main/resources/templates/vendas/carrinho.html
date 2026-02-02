@@ -100,15 +100,10 @@
                             <a th:href="@{/login}" class="btn btn-primary">
                                 <i class="bi bi-box-arrow-in-right"></i> Fazer Login
                             </a>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Ainda não tenho conta
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" th:href="@{/pessoa/formPF}">Cadastrar como Pessoa Física</a></li>
-                                    <li><a class="dropdown-item" th:href="@{/pessoa/formPJ}">Cadastrar como Pessoa Jurídica</a></li>
-                                </ul>
-                            </div>
+
+                            <a th:href="@{/pessoa/form}" class="btn btn-outline-dark">
+                                <i class="bi bi-person-plus"></i> Ainda não tenho conta
+                            </a>
                         </div>
                     </div>
                 </div>
