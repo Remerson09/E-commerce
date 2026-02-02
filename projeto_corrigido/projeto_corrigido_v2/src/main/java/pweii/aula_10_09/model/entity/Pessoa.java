@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public abstract class Pessoa {
 
     // Associação: Um Cliente (Pessoa) pode ter Várias Vendas (OneToMany)
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Venda> vendas;
+    private List<Venda> vendas = new ArrayList<>();;
 
 
     public Pessoa(String email, String telefone) {
@@ -50,7 +51,6 @@ public abstract class Pessoa {
         this.telefone = telefone;
 
     }
-    @ManyToOne // ou @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.REMOVE)
     private Usuario usuario;
 }

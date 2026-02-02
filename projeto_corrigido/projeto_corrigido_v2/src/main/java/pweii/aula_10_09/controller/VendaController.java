@@ -17,6 +17,7 @@ import pweii.aula_10_09.model.repository.VendaRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Transactional
@@ -34,8 +35,14 @@ public class VendaController {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    @ModelAttribute("vendaEmAndamento")
+    public Venda inicializarVenda() {
+        Venda venda = new Venda();
+        venda.setItens(new ArrayList<>()); // <--- ADICIONE ESTA LINHA
+        return venda;
+    }
     @GetMapping("/list")
-    public ModelAndView listar(ModelMap model) {
+    public ModelAndView listar(ModelMap model, @ModelAttribute("vendaEmAndamento") Venda vendaAtual) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String login = auth.getName();
         Usuario usuario = usuarioRepository.findByLogin(login);
@@ -49,6 +56,10 @@ public class VendaController {
             model.addAttribute("vendas", vendaRepository.findByCliente(usuario.getPessoa()));
         }
 
+        int carrinhoCount = vendaAtual.getItens().stream()
+                .mapToInt(item -> item.getQuantidade().intValue()).sum();
+        model.addAttribute("carrinhoCount", carrinhoCount);
+
         return new ModelAndView("vendas/list", model);
     }
 
@@ -58,8 +69,12 @@ public class VendaController {
                 .map(item -> item.getProduto().getValor().multiply(BigDecimal.valueOf(item.getQuantidade())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        int carrinhoCount = venda.getItens().stream()
+                .mapToInt(item -> item.getQuantidade().intValue()).sum();
+
         model.addAttribute("vendaAtual", venda);
         model.addAttribute("totalVenda", totalCalculado);
+        model.addAttribute("carrinhoCount", carrinhoCount);
 
         return new ModelAndView("vendas/carrinho", model);
     }
@@ -74,8 +89,9 @@ public class VendaController {
         String login = auth.getName();
         Usuario usuario = usuarioRepository.findByLogin(login);
 
+        // Se o usuário não existe ou não tem pessoa vinculada
         if (usuario == null || usuario.getPessoa() == null) {
-            attr.addFlashAttribute("error", "Você precisa estar logado e ter um cadastro de cliente para finalizar a venda!");
+            attr.addFlashAttribute("error", "Você precisa estar logado e ter um cadastro de cliente completo para finalizar a venda!");
             return "redirect:/vendas/carrinho";
         }
 
@@ -110,13 +126,18 @@ public class VendaController {
     }
 
     @GetMapping("/detalhe/{id}")
-    public ModelAndView details(@PathVariable("id") Long id, ModelMap model) {
+    public ModelAndView details(@PathVariable("id") Long id, ModelMap model, @ModelAttribute("vendaEmAndamento") Venda vendaAtual) {
         Optional<Venda> busca = vendaRepository.findById(id);
         if (busca.isPresent()) {
             model.addAttribute("venda", busca.get());
         } else {
             model.addAttribute("venda", new Venda());
         }
+
+        int carrinhoCount = vendaAtual.getItens().stream()
+                .mapToInt(item -> item.getQuantidade().intValue()).sum();
+        model.addAttribute("carrinhoCount", carrinhoCount);
+
         return new ModelAndView("vendas/detalhe", model);
     }
 

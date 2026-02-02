@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public class PessoaFisica extends Pessoa {
     private String nome;
 
     @NotBlank(message = "O CPF é obrigatório")
-    @CPF(message = "CPF inválido")
+    @Pattern(regexp = "\\d{11}", message = "O CPF deve conter 11 dígitos numéricos")
     @Column(nullable = true, unique = true)
     private String cpf;
 

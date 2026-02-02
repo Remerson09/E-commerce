@@ -28,7 +28,7 @@ public class ProdutoController {
     ProdutoRepository produtoRepository;
 
     /**
-     * ESSENCIAL: Cria a venda na sessão se ela não existir.
+     *  Cria a venda na sessão se ela não existir.
      */
     @ModelAttribute("vendaEmAndamento")
     public Venda inicializarVenda() {
@@ -96,7 +96,7 @@ public class ProdutoController {
     }
 
     /**
-     * MÉTODO SEPARADO: SALVAR (INSERT)
+     *
      */
     @PostMapping("/save")
     public String save(@Valid Produto produto, BindingResult result, RedirectAttributes attr) {
@@ -110,7 +110,7 @@ public class ProdutoController {
     }
 
     /**
-     * MÉTODO SEPARADO: ATUALIZAR (UPDATE)
+     *
      */
     @PostMapping("/update")
     public String update(@Valid Produto produto, BindingResult result, RedirectAttributes attr) {

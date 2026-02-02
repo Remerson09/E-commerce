@@ -6,7 +6,7 @@ import pweii.aula_10_09.model.entity.Usuario;
 
 public interface UsuarioRepository  extends JpaRepository<Usuario, Long> {
 
-    @Query("from Usuario u where u.login = :login")
+    @Query("select u from Usuario u where u.login = ?1")
     Usuario usuario(String login);
 
     Usuario findByLogin(String login);

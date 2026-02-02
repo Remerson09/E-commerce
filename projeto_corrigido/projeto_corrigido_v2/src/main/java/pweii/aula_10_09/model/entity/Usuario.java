@@ -28,7 +28,7 @@ public class Usuario implements Serializable, UserDetails {
     @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 
     public Pessoa getPessoa() {

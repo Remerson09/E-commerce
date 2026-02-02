@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,7 +30,7 @@ public class Venda {
     private String descricao;
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemVenda> itens;
+    private List<ItemVenda> itens = new ArrayList<>();
 
     // 💡 CORREÇÃO: Nome do método ajustado para getTotal() (UML). Mantido BigDecimal.
     @Transient
