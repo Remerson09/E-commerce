@@ -59,9 +59,12 @@
                             </button>
                         </form>
 
-                        <div class="mt-3">
-                            <a th:href="@{/produto/edit/{id}(id=${p.id})}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                            <a th:href="@{/produto/remove/{id}(id=${p.id})}" class="btn btn-sm btn-outline-danger"
+                        <div class="mt-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                            <a th:href="@{/produto/edit/{id}(id=${p.id})}"
+                               class="btn btn-sm btn-outline-secondary">Editar</a>
+
+                            <a th:href="@{/produto/remove/{id}(id=${p.id})}"
+                               class="btn btn-sm btn-outline-danger"
                                onclick="return confirm('Tem certeza que deseja remover este produto?');">
                                 Remover
                             </a>

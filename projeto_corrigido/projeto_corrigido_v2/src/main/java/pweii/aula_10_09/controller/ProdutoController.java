@@ -40,7 +40,7 @@ public class ProdutoController {
     @GetMapping("/list")
     public ModelAndView listar(ModelMap model,
                                @ModelAttribute("vendaEmAndamento") Venda vendaAtual) {
-        model.addAttribute("produtos", produtoRepository.findAll());
+        model.addAttribute("produtos", produtoRepository.findByAtivoTrue());
 
 
         int carrinhoCount = vendaAtual.getItens().stream()
@@ -81,7 +81,7 @@ public class ProdutoController {
         return new ModelAndView("redirect:/produto/list");
     }
 
-    // --- CRUD BÁSICO ---
+
 
     @GetMapping("/form")
     public String form(Produto produto) {
@@ -126,10 +126,14 @@ public class ProdutoController {
     @GetMapping("/remove/{id}")
     public String remove(@PathVariable("id") Long id, RedirectAttributes attr) {
         try {
-            produtoRepository.deleteById(id);
-            attr.addFlashAttribute("success", "Produto removido!");
+            Produto produto = produtoRepository.findById(id).orElse(null);
+            if (produto != null) {
+                produto.setAtivo(false);
+                produtoRepository.save(produto);
+                attr.addFlashAttribute("success", "Produto removido (desativado) com sucesso!");
+            }
         } catch (Exception e) {
-            attr.addFlashAttribute("error", "Não é possível remover um produto vinculado a vendas.");
+            attr.addFlashAttribute("error", "Erro ao tentar remover o produto.");
         }
         return "redirect:/produto/list";
     }

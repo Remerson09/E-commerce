@@ -30,9 +30,9 @@ public class Venda {
     private String descricao;
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemVenda> itens = new ArrayList<>();
+    private List<ItemVenda> itens = new ArrayList<>(); // Uma lista dos itens que compõem a venda. É inicializada com um ArrayList vazio para evitar NullPointerExceptions
 
-    // 💡 CORREÇÃO: Nome do método ajustado para getTotal() (UML). Mantido BigDecimal.
+    // Nome do método ajustado para getTotal() (UML). Mantido BigDecimal.
     @Transient
     public BigDecimal getTotal() {
         BigDecimal total = BigDecimal.ZERO;

@@ -17,13 +17,13 @@ INSERT INTO usuario_roles (usuarios_id, roles_id) VALUES (1, 1);
 INSERT INTO usuario_roles (usuarios_id, roles_id) VALUES (2, 2);
 
 -- 5. PRODUTOS
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (1, 'Café Torrado', 25.00, 'https://images.tcdn.com.br/img/img_prod/1303842/cafe_torrado_e_moido_500gr_torra_media_77_2_dd6c41c3b45515dafc757784acce0c19.jpg');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (2, 'Água Voss', 5.00, 'https://images.tcdn.com.br/img/img_prod/1054850/180_agua_voss_norueguesa_com_gas_vidro_800ml_1075_1_8cfbf69dad867977c8de0e50a059ec49.png');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (3, 'Cápsula de Espresso', 32.90, 'https://www.cafefacil.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/3/1363_0_1.jpg');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (4, 'Biscoito Amanteigado', 12.50, 'https://mercantilnovaera.vtexassets.com/arquivos/ids/207196/Biscoito-Amanteigado-Fortaleza-Tradicional-Embalagem-330.jpg?v=638203819927170000');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (5, 'Chocolate Amargo 70%', 18.00, 'https://img.megaboxatacado.com.br/produto/1000X1000/2023621_alind.jpg');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (6, 'Chá Verde Orgânico', 15.00, 'https://m.media-amazon.com/images/I/517x9TRfkhL._AC_UF894,1000_QL80_.jpg');
-INSERT INTO produtos (id, descricao, valor, imagem_url) VALUES (7, 'Caneca de Cerâmica', 45.00, 'https://portobrasil.vtexassets.com/arquivos/ids/179001/11314109201---CANECA-ORGANICO-LITCHI---02.jpg?v=638219123923230000');
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (1, 'Café Torrado', 25.00, 'https://images.tcdn.com.br/img/img_prod/1303842/cafe_torrado_e_moido_500gr_torra_media_77_2_dd6c41c3b45515dafc757784acce0c19.jpg',true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (2, 'Água Voss', 5.00, 'https://images.tcdn.com.br/img/img_prod/1054850/180_agua_voss_norueguesa_com_gas_vidro_800ml_1075_1_8cfbf69dad867977c8de0e50a059ec49.png',true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (3, 'Cápsula de Espresso', 32.90, 'https://www.cafefacil.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/3/1363_0_1.jpg', true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (4, 'Biscoito Amanteigado', 12.50, 'https://mercantilnovaera.vtexassets.com/arquivos/ids/207196/Biscoito-Amanteigado-Fortaleza-Tradicional-Embalagem-330.jpg?v=638203819927170000',true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (5, 'Chocolate Amargo 70%', 18.00, 'https://img.megaboxatacado.com.br/produto/1000X1000/2023621_alind.jpg',true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (6, 'Chá Verde Orgânico', 15.00, 'https://m.media-amazon.com/images/I/517x9TRfkhL._AC_UF894,1000_QL80_.jpg',true);
+INSERT INTO produtos (id, descricao, valor, imagem_url, ativo) VALUES (7, 'Caneca de Cerâmica', 45.00, 'https://portobrasil.vtexassets.com/arquivos/ids/179001/11314109201---CANECA-ORGANICO-LITCHI---02.jpg?v=638219123923230000',true);
 
 -- 6. VENDAS
 INSERT INTO vendas (id, cliente_id, data_venda, descricao) VALUES (1, 1, NOW(), 'Venda inicial para Joao Silva');
