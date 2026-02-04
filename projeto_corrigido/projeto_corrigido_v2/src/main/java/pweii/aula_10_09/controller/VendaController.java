@@ -38,9 +38,10 @@ public class VendaController {
     @ModelAttribute("vendaEmAndamento")
     public Venda inicializarVenda() {
         Venda venda = new Venda();
-        venda.setItens(new ArrayList<>()); // <--- ADICIONE ESTA LINHA
+        venda.setItens(new ArrayList<>());
         return venda;
     }
+
     @GetMapping("/list")
     public ModelAndView listar(ModelMap model, @ModelAttribute("vendaEmAndamento") Venda vendaAtual) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

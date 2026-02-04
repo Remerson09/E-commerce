@@ -21,22 +21,17 @@ import java.math.BigDecimal; // 💡 Importação essencial
 @Table(name = "produtos")
 public class Produto implements Serializable {
 
-    // Getters e Setters atualizados para BigDecimal
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Getter
+
     @NotBlank(message = "A descrição do produto é obrigatória")
     @Size(min = 2, max = 100, message = "A descrição deve ter entre 2 e 100 caracteres")
     @Column(nullable = false, length = 100)
     private String descricao;
 
-    @Setter
-    @Getter
+
     @NotNull(message = "O valor do produto deve ser informado")
     @DecimalMin(value = "0.01", message = "O valor deve ser maior que zero")
     @Column(nullable = false, precision = 10, scale = 2)
@@ -44,5 +39,10 @@ public class Produto implements Serializable {
 
     @Column(length = 500)
     private String imagemUrl;
+
+
+    @Column(nullable = false)
+    private boolean ativo = true;
+
 
 }

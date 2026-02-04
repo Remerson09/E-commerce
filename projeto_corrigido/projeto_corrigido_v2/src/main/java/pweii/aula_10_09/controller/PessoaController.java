@@ -95,7 +95,7 @@ public class PessoaController {
             return new ModelAndView("redirect:/pessoa/form");
         }
 
-        // Verifica se o login já existe antes de criar
+
         if (usuarioRepository.findByLogin(login) != null) {
             attr.addFlashAttribute("error", "Este login já está em uso!");
             return new ModelAndView("redirect:/pessoa/form");
@@ -124,7 +124,7 @@ public class PessoaController {
         usuarioRepository.save(usuario);
     }
 
-    // --- MÉTODOS DE ADMINISTRAÇÃO E VISUALIZAÇÃO ---
+
 
     @GetMapping("/edit/{id}")
     public ModelAndView edit(@PathVariable("id") Long id, ModelMap model) {
